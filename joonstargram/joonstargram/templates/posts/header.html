@@ -1,0 +1,44 @@
+{% load static %}
+{% load bootstrap5 %}
+
+<header>
+
+  <div class="header-box">
+    <div class="logo-img">
+      <a href="{% url 'posts:index' %}">
+        <img src="{% static "images/posts/logo.png" %}" alt="logo" />
+      </a>
+    </div>
+
+    <div class="search-box">
+      <form method="get" action="{% url 'posts:search' %}" enctype="multipart/form-data">
+        <input type="text" name="keyword" value="{{ keyword }}" placeholder="Search" />
+      </form>
+    </div>
+
+    <div class="header-right">
+      <div>
+        <a href="{% url 'posts:index' %}">
+          <i class="fas fa-home fa-2x"></i>
+        </a>
+      </div>
+      <div>
+        <a href="{% url 'posts:post_create' %}">
+          <i class="fas fa-plus-circle fa-2x"></i>
+        </a>
+      </div>
+      <div class="dropdown">
+        <a  href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="fas fa-user fa-2x"></i>
+        </a>
+
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+          <li><a class="dropdown-item" href="{% url 'posts:profile' %}">Profile</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="{% url 'users:logout' %}">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</header>

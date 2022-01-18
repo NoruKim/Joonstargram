@@ -1,0 +1,44 @@
+{% extends "posts/base.html" %}
+{% load static %}
+
+{% block title %}
+User Search
+{% endblock %}
+
+{% block content %}
+
+
+{% for user in users %}
+  <div class="search-result-box">
+    <div class="profile-image">
+    {% if user.profile_photo != None %}
+      <img src="{{ user.profile_photo}}">
+    {% else %}
+      <img src="{% static "images/posts/default_profile.png" %}">
+    {% endif %}
+    </div>
+
+    <div class="profile-main">
+      <a href="{% url "posts:other_profile" user.id %}">
+        <b>{{ user.username }}</b>
+      </a>
+      <br /><br />
+      {% if user.intro %}
+        {{ user.intro }}
+      {% endif %}
+    </div>
+
+    <div class="icon-follow">
+      <a href="{% url "posts:follow" user.id %}">
+      {% if request.user.id in user.followers %}
+        <i class="fas fa-user-check fa-2x"></i>
+      {% else %}
+        <i class="fas fa-user fa-2x"></i>
+      {% endif %}
+      </a>
+    </div>
+
+  </div>
+{% endfor %}
+
+{% endblock %}

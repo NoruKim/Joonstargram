@@ -1,0 +1,26 @@
+{% extends "posts/base.html" %}
+
+{% block title %}
+Update Profile
+{% endblock %}
+
+{% block content %}
+<div class="post-edit">
+  <div class="create">
+
+
+      <h1>Update Profile</h1>
+
+
+    <div class="form">
+      <form method="post" action="{% url 'posts:profile_update' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Update">
+      </form>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

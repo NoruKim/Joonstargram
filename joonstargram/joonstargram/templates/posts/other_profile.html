@@ -1,0 +1,56 @@
+{% extends "posts/base.html" %}
+{% load static %}
+
+{% block title %}
+{{ user.username }} Profile
+{% endblock %}
+
+{% block content %}
+
+<div class="profile-box">
+
+  <div class="profile-img">
+    <img src={% if user.profile_photo %}"{{ user.profile_photo.url }}"
+              {% else %}"{% static "images/posts/default_profile.png" %}"
+              {% endif %}
+              >
+  </div>
+
+  <div class="profile-main">
+    <div class="profile-header">
+      <h2>{{ user.username }}</h2>
+    </div>
+
+    <ul class="counts">
+      <li>ポスト <b>0</b></li>
+      <li>フォロワー <b>{{ user.followers.count }}</b></li>
+      <li>フォロー <b>{{ user.followings.count }}</b></li>
+    </ul>
+
+    <div class="profile">
+      <h3>{{ user.name }}</h3><br />
+      {% if user.intro != None %}
+      <span>{{ user.intro }}</span>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+<div class="thumnail-box">
+
+  <div class="thumnail-header">
+    <h2>ポスト</h2>
+  </div>
+
+  {% if posts %}
+  <div class="thumnail-main">
+      {% for post in posts %}
+        <img src="{{ post.image }}">
+      {% endfor %}
+  </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "posts/base.html" %}
+
+{% block title %}
+Update Post
+{% endblock %}
+
+{% block content %}
+<div class="post-edit">
+  <div class="create">
+
+
+      <h1>Update Post</h1>
+
+
+    <div class="form">
+      <form method="post" action="{% url 'posts:post_update' post.id %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Update">
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

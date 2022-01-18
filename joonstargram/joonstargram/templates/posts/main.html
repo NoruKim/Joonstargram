@@ -1,0 +1,76 @@
+{% extends "posts/base.html" %}
+{% load static %}
+
+{% block content %}
+
+  {% for post in posts %}
+    <div class="post-box">
+      <div class="header">
+        <div class="profile">
+          {% if post.author.profile_photo != None %}
+            <img src="{{ post.author.profile_photo}}">
+          {% else %}
+            <img src="{% static "images/posts/default_profile.png" %}">
+          {% endif %}
+            <div>
+              {{ post.author.username }}
+            </div>
+        </div>
+
+        {% if user.id == post.author.id %}
+          <div class="icon">
+            <a href="{% url 'posts:post_update' post.id %}">
+              <i class="fas fa-pencil-alt fa-lg"></i>
+            </a>
+            <a href="{% url 'posts:post_delete' post.id %}">
+              <i class="fas fa-trash-alt fa-lg"></i>
+            </a>
+          </div>
+        {% endif %}
+      </div>
+
+      <img class="post-image" src="{{ post.image }}">
+
+      <div class="like-icon">
+        <a href="{% url 'posts:post_image_like' post.id %}">
+          {% if user.id in post.image_likes %}
+            <i class="fas fa-heart fa-2x" style="color: red;"></i>
+          {% else %}
+            <i class="far fa-heart fa-2x"></i>
+          {% endif %}
+        </a>
+        {{ post.image_likes | length }} likes
+      </div>
+
+      <div class="desc-box">
+        <div class="caption">
+          <b>{{ post.author.username }}</b>
+          {{ post.caption }}
+        </div>
+
+        <div class="comment">
+          {% for comment in post.comment_post %}
+            <div>
+              <b>{{ comment.author.username }}</b>
+              {{ comment.content }}
+              {% if user.id == comment.author.id %}
+                <a href="{% url 'posts:comment_delete' comment.id %}">
+                  <i class="fas fa-trash-alt" style="color: #0095f6;"></i>
+                </a>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="comment-input">
+        <form method="post" action="{% url 'posts:comment_create' post.id %}">
+          {% csrf_token %}
+          {{ comment_form }}
+          <input type="submit" value="作成">
+        </form>
+      </div>
+    </div>
+  {% endfor %}
+
+{% endblock %}
