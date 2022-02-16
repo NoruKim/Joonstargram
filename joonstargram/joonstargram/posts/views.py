@@ -7,7 +7,13 @@ from .models import *
 from .serializers import *
 from .forms import *
 
+from rest_framework import serializers, viewsets
+
 # Create your views here.
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
 def index(request):
     if request.method == 'GET':
         if request.user.is_authenticated:

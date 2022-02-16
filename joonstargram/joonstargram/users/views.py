@@ -19,6 +19,33 @@ from django.core.mail import EmailMessage, send_mail
 from .tokens import account_activation_token
 from django.utils.encoding import force_bytes, force_text
 
+from rest_framework import viewsets
+from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .serializers import UserSerializer
+
+# ViewSets define the view behavior.
+class HelloWorldAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        return Response(data={"greeting": "Hello World"}, status=status.HTTP_200_OK)
+
+class UserViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+class CurrentUserAPIView(APIView):
+
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
+
 def main(request):
     if request.method == 'GET':
         return render(request, 'users/main.html')

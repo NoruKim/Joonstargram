@@ -4,6 +4,7 @@ Base settings to build other settings files upon.
 from pathlib import Path
 
 import environ
+import datetime
 
 ROOT_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 # joonstargram/
@@ -72,17 +73,33 @@ THIRD_PARTY_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-    "bootstrap5",
+    "rest_auth",
+    "rest_auth.registration",
 ]
 
 LOCAL_APPS = [
+    "corsheaders",
     "joonstargram.users.apps.UsersConfig",
     "joonstargram.posts.apps.PostsConfig",
     "rest_framework",
+    "rest_framework.authtoken",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
+        # 'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
 
 # MIGRATIONS
 # ------------------------------------------------------------------------------
@@ -99,7 +116,7 @@ AUTHENTICATION_BACKENDS = [
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
-LOGIN_REDIRECT_URL = "users:redirect"
+# LOGIN_REDIRECT_URL = "users:redirect"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
 LOGIN_URL = "account_login"
 
@@ -126,7 +143,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # MIDDLEWARE
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
+
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
@@ -137,6 +156,44 @@ MIDDLEWARE = [
     "django.middleware.common.BrokenLinkEmailsMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+# cors header setting
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = [
+    'https://localhost:8080',
+    'https://172.30.1.17:8080',
+    'https://localhost:8000',
+    'http://127.0.0.1:8000',
+]
+CORS_ALLOWED_ORIGINS = [
+    'https://localhost:8080',
+    'https://172.30.1.17:8080',
+    'https://localhost:8000',
+    'http://127.0.0.1:8000',
+]
+CORS_ALLOW_METHODS = (
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+)
+CORS_ALLOW_HEADERS = (
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'access-control-request-method',
+    'access-control-request-headers',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+)
 
 # STATIC
 # ------------------------------------------------------------------------------
@@ -271,9 +328,9 @@ ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 ACCOUNT_AUTHENTICATION_METHOD = "username"
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_REQUIRED = False
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_VERIFICATION = "none"
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 ACCOUNT_ADAPTER = "joonstargram.users.adapters.AccountAdapter"
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
@@ -282,3 +339,19 @@ SOCIALACCOUNT_ADAPTER = "joonstargram.users.adapters.SocialAccountAdapter"
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+#JWT_AUTH settings
+JWT_AUTH = {
+    # If the secret is wrong, it will raise a jwt.DecodeError telling you as such. You can still get at the payload by setting the JWT_VERIFY to False.
+    'JWT_VERIFY': True,
+    # You can turn off expiration time verification by setting JWT_VERIFY_EXPIRATION to False.
+    # If set to False, JWTs will last forever meaning a leaked token could be used by an attacker indefinitely.
+    'JWT_VERIFY_EXPIRATION': True,
+    # This is an instance of Python's datetime.timedelta. This will be added to datetime.utcnow() to set the expiration time.
+    # Default is datetime.timedelta(seconds=300)(5 minutes).
+    'JWT_ALGORITHM': 'HS256',
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),
+    'JWT_ALLOW_REFRESH': True,
+    'JWT_AUTH_HEADER_PREFIX': 'JWT',
+}
+REST_USE_JWT = True
