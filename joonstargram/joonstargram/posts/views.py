@@ -3,6 +3,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.db.models import Q
 from django.urls import reverse
 from joonstargram.users.models import User
+from rest_framework.permissions import AllowAny
 from .models import *
 from .serializers import *
 from .forms import *
@@ -11,6 +12,7 @@ from rest_framework import serializers, viewsets
 
 # Create your views here.
 class PostViewSet(viewsets.ModelViewSet):
+    permission_classes = (AllowAny,)
     queryset = Post.objects.all()
     serializer_class = PostSerializer
 
