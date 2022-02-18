@@ -1,4 +1,23 @@
 <template>
+  <!-- Post-Modal -->
+  <transition name="fade">
+    <div class="black-bg" v-if="postModal">
+      <div class="white-bg">
+        <div
+          class="upload-image"
+          :style="`background-image:url(${image})`"
+        ></div>
+        <textarea v-model="caption" class="caption-box"></textarea>
+        <div class="upload-btn">
+          <button @click="publish" class="btn btn-primary">Upload</button>
+          <button @click="postModal = false" class="btn btn-danger">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </transition>
+
   <!-- Header -->
   <div class="header">
     <div class="header-box">
@@ -17,7 +36,10 @@
           <i class="fas fa-home fa-2x"></i>
         </div>
         <div>
-          <i class="fas fa-plus-circle fa-2x"></i>
+          <label for="file" class="input-plus">
+            <i class="fas fa-plus-circle fa-2x"></i>
+          </label>
+          <input @change="upload" accept="imgae/*" type="file" id="file" />
         </div>
         <div class="dropdown">
           <a
@@ -66,13 +88,7 @@
       </div>
     </div>
 
-    <v-img
-      class="post-image"
-      :src="post.image"
-      contain
-      height="300px"
-      width="400px"
-    />
+    <img class="post-image" :src="post.image" />
 
     <div class="like-icon">
       <a href="#">
@@ -119,6 +135,20 @@ export default {
     return {
       searchName: "",
       posts: null,
+      postModal: false,
+      image: "",
+      caption: "",
+      comment_post: null,
+      user: {
+        id: 1,
+        username: "noru",
+        profile_photo:
+          "http://127.0.0.1:8000/media/752ffa6f3eebb2e081eda40411b3d3c3d08f9e1b.jpg",
+        intro: "修正テスト",
+        followers: [2, 7],
+        followings: [2, 7],
+      },
+      image_likes: null,
     };
   },
   mounted() {
@@ -130,11 +160,117 @@ export default {
         this.posts = res.data;
       });
     },
+    upload(e) {
+      let img = e.target.files;
+      let img_url = URL.createObjectURL(img[0]);
+      this.image = img_url;
+      this.postModal = true;
+    },
+    publish() {
+      var newPost = {
+        image: this.image,
+        caption: this.caption,
+        comment_post: this.comment_post,
+        author: this.user,
+        image_likes: this.image_likes,
+      };
+      this.axios
+        .post(`http://127.0.0.1:8000/posts/`, newPost, {
+          auth: { username: "ID", password: "PW" },
+        })
+        .then(() => {
+          this.getPost();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
   },
 };
 </script>
 
 <style>
+/* Post-Modal */
+div {
+  box-sizing: border-box;
+}
+
+.black-bg {
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  padding: 20px;
+  z-index: 3;
+  top: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.white-bg {
+  width: 50%;
+  height: 71%;
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.fade-enter-from {
+  opacity: 0;
+}
+.fade-enter-active {
+  transition: all 0.5s;
+}
+.fade-enter-to {
+  opacity: 1;
+}
+.fade-leave-from {
+  opacity: 1;
+}
+.fade-leave-active {
+  transition: all 0.5s;
+}
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Post Create */
+.white-bg .upload-image {
+  width: 90%;
+  height: 450px;
+  border: 1px solid black;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.white-bg .caption-box {
+  border: 1px solid black;
+  width: 90%;
+  height: 100px;
+  padding: 15px;
+  margin: auto;
+  display: block;
+  outline: none;
+}
+
+.white-bg .upload-btn {
+  margin: auto;
+  text-align: center;
+}
+
+.white-bg .upload-btn button {
+  margin: 10px;
+}
+
 /* Header CSS */
 .header {
   height: 60px;
@@ -232,7 +368,8 @@ export default {
 
 .post-box img.post-image {
   width: 100%;
-  height: auto;
+  height: 600px;
+  object-fit: contain;
 }
 
 .post-box .desc-box {

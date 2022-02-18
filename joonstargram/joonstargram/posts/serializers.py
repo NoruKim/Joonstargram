@@ -40,3 +40,12 @@ class PostSerializer(serializers.ModelSerializer):
             "author",
             "image_likes",
         )
+
+    def create(self, validated_data):
+        author_data = validated_data.pop('author')
+        author = User.objects.create(**author_data)
+        comment_data = validated_data.pop('comment_post')
+        comment_post = Comment.objects.create(**comment_data)
+        post = Post.objects.create(author=author, comment_post=comment_post, **validated_data)
+
+        return post
